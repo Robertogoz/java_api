@@ -1,6 +1,7 @@
 package com.robertogoz.api.controllers;
 
 import com.robertogoz.api.dtos.UserDto;
+import com.robertogoz.api.dtos.UserEditDto;
 import com.robertogoz.api.entities.User;
 import com.robertogoz.api.services.UserServices;
 import org.springframework.beans.BeanUtils;
@@ -52,5 +53,19 @@ public class UserController {
         }
         _userServices.delete(UserOptional.get());
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully.");
+    }
+
+    @PutMapping("/user/{id}")
+    public ResponseEntity<Object> updateUser(@PathVariable(value = "id") UUID id,
+                                             @RequestBody @Valid UserEditDto userDto){
+        Optional<User> UserOptional = _userServices.findById(id);
+        if (!UserOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+        var user = new User();
+        BeanUtils.copyProperties(userDto, user);
+        user.setId(UserOptional.get().getId());
+        user.setEmail(UserOptional.get().getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(_userServices.save(user));
     }
 }
