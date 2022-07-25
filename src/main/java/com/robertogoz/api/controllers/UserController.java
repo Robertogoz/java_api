@@ -42,4 +42,15 @@ public class UserController {
         BeanUtils.copyProperties(userDto,user);
         return ResponseEntity.status(HttpStatus.CREATED).body(_userServices.save(user));
     }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable(value = "id") UUID id) {
+        Optional<User> UserOptional = _userServices.findById(id);
+
+        if(!UserOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        _userServices.delete(UserOptional.get());
+        return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully.");
+    }
 }
