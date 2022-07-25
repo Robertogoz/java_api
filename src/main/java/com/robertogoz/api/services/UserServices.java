@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServices {
@@ -24,4 +26,7 @@ public class UserServices {
         return _userRepository.save(user);
     }
 
+    public Optional<User> findById(UUID id) {
+        return _userRepository.findById(id);
+    }
 }
