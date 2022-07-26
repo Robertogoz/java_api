@@ -30,6 +30,8 @@ public class UserServices {
         return _userRepository.findById(id);
     }
 
+    public Optional<User> findByEmail(String email) { return _userRepository.findByEmail(email); }
+
     @Transactional
     public void delete(User user) {
         _userRepository.delete(user);

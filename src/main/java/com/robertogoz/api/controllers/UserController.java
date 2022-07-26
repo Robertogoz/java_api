@@ -2,6 +2,7 @@ package com.robertogoz.api.controllers;
 
 import com.robertogoz.api.dtos.UserDto;
 import com.robertogoz.api.dtos.UserEditDto;
+import com.robertogoz.api.dtos.UserLoginDto;
 import com.robertogoz.api.entities.User;
 import com.robertogoz.api.services.UserServices;
 import org.springframework.beans.BeanUtils;
@@ -70,5 +71,21 @@ public class UserController {
         user.setId(UserOptional.get().getId());
         user.setEmail(UserOptional.get().getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(_userServices.save(user));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody @Valid UserLoginDto userLoginDto) {
+        var user = _userServices.findByEmail(userLoginDto.getEmail());
+
+        if(!user.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email or password incorrect");
+        }
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        boolean itMatches = passwordEncoder.matches(userLoginDto.getPassword(), user.get().getPassword());
+        if(!itMatches) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email or password incorrect");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("User Signed In");
     }
 }
