@@ -7,6 +7,7 @@ import com.robertogoz.api.services.UserServices;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,7 +41,9 @@ public class UserController {
     @PostMapping(value = ("/user"))
     public ResponseEntity<Object> saveUser(@RequestBody @Valid UserDto userDto) {
         var user = new User();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         BeanUtils.copyProperties(userDto,user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return ResponseEntity.status(HttpStatus.CREATED).body(_userServices.save(user));
     }
 
