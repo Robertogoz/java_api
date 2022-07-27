@@ -33,7 +33,7 @@ public class UserController {
     @GetMapping(value = ("/user/{id}"))
     public ResponseEntity<Object> getOneUser(@PathVariable(value="id") UUID id) {
         Optional<User> UserOptional = _userServices.findById(id);
-        if(!UserOptional.isPresent()) {
+        if(UserOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
         return ResponseEntity.status(HttpStatus.OK).body(UserOptional.get());
@@ -52,7 +52,7 @@ public class UserController {
     public ResponseEntity<Object> deleteUser(@PathVariable(value = "id") UUID id) {
         Optional<User> UserOptional = _userServices.findById(id);
 
-        if(!UserOptional.isPresent()) {
+        if(UserOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
         _userServices.delete(UserOptional.get());
@@ -63,7 +63,7 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@PathVariable(value = "id") UUID id,
                                              @RequestBody @Valid UserEditDto userDto){
         Optional<User> UserOptional = _userServices.findById(id);
-        if (!UserOptional.isPresent()) {
+        if (UserOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
         var user = new User();
@@ -75,14 +75,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid UserLoginDto userLoginDto) {
-        var user = _userServices.findByEmail(userLoginDto.getEmail());
+        var OptionalUser = _userServices.findByEmail(userLoginDto.getEmail());
 
-        if(!user.isPresent()) {
+        if(OptionalUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email or password incorrect");
         }
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        boolean itMatches = passwordEncoder.matches(userLoginDto.getPassword(), user.get().getPassword());
+        boolean itMatches = passwordEncoder.matches(userLoginDto.getPassword(), OptionalUser.get().getPassword());
         if(!itMatches) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email or password incorrect");
         }
